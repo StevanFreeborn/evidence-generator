@@ -45,13 +45,13 @@ public class OnspringApiKeyAuthenticationHandlerTests
   }
 
   [Fact]
-  public async Task HandleAuthenticateAsync_MissingHeader_Fails()
+  public async Task HandleAuthenticateAsync_MissingHeader_ReturnsNoResult()
   {
     var result = await RunHandlerAsync();
 
     Assert.False(result.Succeeded);
-    Assert.NotNull(result.Failure);
-    Assert.Contains(OnspringApiKeyAuthenticationDefaults.HeaderName, result.Failure.Message);
+    Assert.True(result.None);
+    Assert.Null(result.Failure);
   }
 
   [Theory]

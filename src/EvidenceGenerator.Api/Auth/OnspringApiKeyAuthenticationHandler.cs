@@ -16,7 +16,7 @@ internal sealed class OnspringApiKeyAuthenticationHandler(
   {
     if (Request.Headers.TryGetValue(OnspringApiKeyAuthenticationDefaults.HeaderName, out var apiKeyValues) is false)
     {
-      return Task.FromResult(AuthenticateResult.Fail($"Missing '{OnspringApiKeyAuthenticationDefaults.HeaderName}' header."));
+      return Task.FromResult(AuthenticateResult.NoResult());
     }
 
     var apiKey = apiKeyValues.FirstOrDefault();
