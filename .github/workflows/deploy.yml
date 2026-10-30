@@ -1,0 +1,72 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+env:
+  IMAGE_NAME: evidence-generator
+  CONTAINER_NAME: evidence-generator
+jobs:
+  build-and-deploy:
+    name: Build, Publish & Deploy Container
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Publish Container Image to Docker Hub
+        run: |
+          dotnet publish src/EvidenceGenerator.Api/EvidenceGenerator.Api.csproj \
+            -c Release \
+            -t:PublishContainer \
+            /p:PublishContainer=true \
+            /p:ContainerRegistry=registry.hub.docker.com \
+            /p:ContainerRepository="${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}"
+      - name: Deploy to Target Server via SSH
+        uses: appleboy/ssh-action@v1.2.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest"
+            CONTAINER="${{ env.CONTAINER_NAME }}"
+            HOST_PORT="${{ secrets.APP_PORT || '8080' }}"
+
+            echo "Pulling latest image: $IMAGE"
+
+            docker pull "$IMAGE"
+
+            echo "Stopping and removing existing container if running..."
+
+            if [ "$(docker ps -aq -f name=^/${CONTAINER}$)" ]; then
+              docker stop "$CONTAINER" || true
+              docker rm "$CONTAINER" || true
+            fi
+
+            echo "Starting new container version..."
+
+            docker run -d \
+              --name "$CONTAINER" \
+              --restart unless-stopped \
+              -p "${HOST_PORT}:8080" \
+              -e ASPNETCORE_ENVIRONMENT=Production \
+              ${{ secrets.APP_ENV_VARS }} \
+              "$IMAGE"
+
+            echo "Verifying container is running..."
+            
+            sleep 3
+            docker ps -f name=^/${CONTAINER}$
+            
+            echo "Deployment completed successfully!"

@@ -1,0 +1,12 @@
+[*.cs]
+# In test projects, standard unit test method naming uses underscores (e.g., Method_Scenario_ExpectedResult)
+dotnet_diagnostic.CA1707.severity = none
+
+# Test projects do not require ConfigureAwait(false)
+dotnet_diagnostic.CA2007.severity = none
+
+# NSubstitute mock setup syntax like mock.MethodAsync().Returns(...) triggers CA2012 falsely for ValueTask-returning interface methods
+dotnet_diagnostic.CA2012.severity = none
+
+# Test inline collection allocations (CA1861) do not need to be static readonly fields in tests
+dotnet_diagnostic.CA1861.severity = none

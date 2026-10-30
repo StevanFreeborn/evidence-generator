@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evidence Generator Documentation</title>
+  <style>
+    :root {
+      font-size: 16px;
+      --bg: #121212;
+      --fg: #e0e0e0;
+      --link: #8ab4f8;
+      --border: #444444;
+      --code-bg: #1e1e1e;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #ffffff;
+        --fg: #222222;
+        --link: #1a0dab;
+        --border: #cccccc;
+        --code-bg: #f4f4f4;
+      }
+    }
+
+    html {
+      font-size: 16px;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.5;
+      margin: 1.5rem auto;
+      max-width: 54rem;
+      padding: 0 1rem;
+    }
+
+    .toc {
+      margin: 1.5rem 0 2rem 0;
+      border: 0.0625rem solid var(--border);
+      padding: 1rem 1.25rem;
+      background-color: var(--code-bg);
+    }
+
+    .toc h2 {
+      font-size: 1rem;
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+      border-bottom: none;
+      padding-bottom: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.05rem;
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+      gap: 0.5rem 1.5rem;
+    }
+
+    .toc ul {
+      list-style-type: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    .toc li {
+      margin-bottom: 0.35rem;
+      font-size: 0.9rem;
+    }
+
+    .toc li a {
+      text-decoration: none;
+    }
+
+    .toc li a:hover {
+      text-decoration: underline;
+    }
+
+    .toc .sub-list {
+      padding-left: 0.75rem;
+      margin-top: 0.25rem;
+      margin-bottom: 0.5rem;
+      border-left: 0.0625rem solid var(--border);
+    }
+
+    header {
+      margin-bottom: 2rem;
+      border-bottom: 0.0625rem solid var(--border);
+      padding-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+      border-bottom: 0.0625rem solid var(--border);
+      padding-bottom: 0.25rem;
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      margin-top: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      margin-bottom: 0.75rem;
+    }
+
+    a {
+      color: var(--link);
+    }
+
+    .sidebar nav {
+      margin-top: 0;
+      margin-bottom: 0;
+      display: block;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1rem 0;
+    }
+
+    th, td {
+      border: 0.0625rem solid var(--border);
+      padding: 0.4rem 0.6rem;
+      text-align: left;
+    }
+
+    th {
+      font-weight: bold;
+    }
+
+    code, pre {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.9rem;
+    }
+
+    code {
+      background-color: var(--code-bg);
+      padding: 0.1rem 0.25rem;
+    }
+
+    pre {
+      background-color: var(--code-bg);
+      border: 0.0625rem solid var(--border);
+      padding: 0.75rem;
+      overflow-x: auto;
+      margin: 0.75rem 0 1.25rem 0;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+    }
+
+    article {
+      margin-bottom: 1.5rem;
+    }
+
+    button {
+      background-color: var(--code-bg);
+      color: var(--fg);
+      border: 0.0625rem solid var(--border);
+      padding: 0.35rem 0.75rem;
+      font-size: 0.85rem;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: var(--fg);
+    }
+
+    .prompt-container {
+      position: relative;
+    }
+
+    .prompt-container pre {
+      padding-top: 2.5rem;
+    }
+
+    .prompt-container button {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      border-top: 0.0625rem solid var(--border);
+      padding-top: 1rem;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Evidence Generator</h1>
+    <p>Automated compliance evidence generation and record attachment service for Onspring.</p>
+  </header>
+
+  <nav class="toc" aria-label="Table of Contents">
+    <h2>Table of Contents</h2>
+    <div class="toc-grid">
+      <ul>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#llm-prompt">Generate with an LLM</a></li>
+        <li><a href="#authentication">Authentication</a></li>
+        <li><a href="#generate-endpoint">POST /generate</a></li>
+        <li><a href="#base-parameters">Base Request Parameters</a></li>
+        <li><a href="#status-codes">HTTP Status Codes</a></li>
+      </ul>
+      <ul>
+        <li>
+          <strong><a href="#file-types">Supported Formats</a></strong>
+          <ul class="sub-list">
+            <li><a href="#type-txt">1. Plain Text (.txt)</a></li>
+            <li><a href="#type-html">2. HTML Document (.html)</a></li>
+            <li><a href="#type-csv">3. Delimited CSV (.csv)</a></li>
+            <li><a href="#type-xlsx">4. Microsoft Excel (.xlsx)</a></li>
+            <li><a href="#type-docx">5. Microsoft Word (.docx)</a></li>
+            <li><a href="#type-pptx">6. Microsoft PowerPoint (.pptx)</a></li>
+            <li><a href="#type-pdf">7. Portable Document Format (.pdf)</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <section id="overview">
+      <h2>Service Overview</h2>
+      <p>
+        The Evidence Generator service accepts requests for automated evidence collection, creates the target file in memory, creates an Onspring record, and uploads the generated artifact as an attachment to that record.
+      </p>
+      <p>
+        Requests submitted to <code>POST /generate</code> are validated and placed onto a background processing queue. The service immediately returns <code>202 Accepted</code> with a job identifier while generation and Onspring upload run in the background.
+      </p>
+    </section>
+
+    <section id="llm-prompt">
+      <h2>Generate with an LLM</h2>
+      <p>
+        If you are using an LLM (such as ChatGPT, Claude, or Copilot) to convert logs, scan results, or audit artifacts into a valid JSON request payload, copy this prompt context and paste it into your LLM along with your source data or requirements.
+      </p>
+      <div class="prompt-container">
+        <button type="button" id="copy-btn" onclick="copyPrompt()">Copy Prompt</button>
+        <pre><code id="prompt-content">You are an assistant generating valid JSON request bodies for the Evidence Generator API.
+
+Endpoint: POST /generate
+Header: Content-Type: application/json
+Header: X-Onspring-ApiKey: &lt;YOUR_API_KEY&gt;
+
+The request must be a valid JSON object matching this schema:
+
+Base Properties (Required for all types):
+- "fileType": string (Required) - Exactly one of: "txt", "html", "csv", "xlsx", "docx", "pptx", "pdf"
+- "appId": integer (Required) - Target Onspring Application ID (e.g. 1050)
+- "attachmentFieldId": integer (Required) - Target Attachment Field ID (e.g. 5012)
+- "fileName": string (Required) - The file name (e.g. "evidence_output.txt")
+- "notes": string (Optional) - Description or notes for the uploaded file record
+- "recordFields": object (Optional) - Dictionary of Onspring field ID (as string or int) to field value (string, number, array of strings/numbers)
+
+Format-Specific Properties (Add based on "fileType"):
+
+1. When "fileType": "txt"
+- "text": string (Required) - Plain text content
+
+2. When "fileType": "html"
+- "title": string (Required) - Document title
+- "markdownOrHtmlBody": string (Required) - Body content in Markdown or HTML
+
+3. When "fileType": "csv"
+- "headers": array of strings (Required) - Column header names
+- "rows": array of arrays of strings (Required) - Table rows matching headers
+
+4. When "fileType": "xlsx"
+- "sheets": array of objects (Required), each with:
+  - "name": string (Required) - Sheet name
+  - "headers": array of strings (Required) - Column names
+  - "rows": array of arrays of strings (Required) - Matrix of row cells
+
+5. When "fileType": "docx"
+- "title": string (Required) - Document title
+- "sections": array of objects (Required), each with:
+  - "heading": string (Required) - Section heading
+  - "paragraphs": array of strings (Optional) - Paragraph texts
+  - "bulletPoints": array of strings (Optional) - List items
+  - "table": object (Optional) with "headers": string[] and "rows": string[][]
+
+6. When "fileType": "pptx"
+- "title": string (Required) - Presentation title
+- "subtitle": string (Optional) - Subtitle on title slide
+- "slides": array of objects (Required), each with:
+  - "title": string (Required) - Slide title
+  - "bulletPoints": array of strings (Optional) - Bulleted list
+  - "table": object (Optional) with "headers": string[] and "rows": string[][]
+
+7. When "fileType": "pdf"
+- "title": string (Required) - Document title
+- "sections": array of objects (Required), each with:
+  - "heading": string (Required) - Section heading
+  - "paragraphs": array of strings (Optional) - Paragraph texts
+  - "table": object (Optional) with "headers": string[] and "rows": string[][]
+
+Task Instructions:
+- Output ONLY a single, valid, raw JSON object without markdown fences or extraneous commentary.
+- Ensure all required fields are present and properly typed.
+- Fit the evidence content logically into the chosen format.
+
+---
+[SOURCE DATA / USER REQUIREMENTS]:
+</code></pre>
+      </div>
+    </section>
+
+    <section id="authentication">
+      <h2>Authentication</h2>
+      <p>Requests to <code>POST /generate</code> require an Onspring API key passed in the request header:</p>
+      <pre><code>X-Onspring-ApiKey: &lt;YOUR_ONSPRING_API_KEY&gt;</code></pre>
+      <p>Requests without a valid API key return <code>401 Unauthorized</code>.</p>
+    </section>
+
+    <section id="generate-endpoint">
+      <h2>POST /generate</h2>
+      <p><strong>Header:</strong> <code>Content-Type: application/json</code></p>
+      <p><strong>Success Response:</strong> <code>202 Accepted</code></p>
+      <pre><code>{
+  "jobId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "status": "Queued"
+}</code></pre>
+    </section>
+
+    <section id="base-parameters">
+      <h2>Base Request Parameters</h2>
+      <p>All payloads sent to <code>POST /generate</code> accept these base fields:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>fileType</code></td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>Format discriminator: <code>txt</code>, <code>html</code>, <code>csv</code>, <code>xlsx</code>, <code>docx</code>, <code>pptx</code>, <code>pdf</code>.</td>
+          </tr>
+          <tr>
+            <td><code>appId</code></td>
+            <td>integer</td>
+            <td>Yes</td>
+            <td>Target Onspring Application ID where the record will be created.</td>
+          </tr>
+          <tr>
+            <td><code>attachmentFieldId</code></td>
+            <td>integer</td>
+            <td>Yes</td>
+            <td>Target Attachment Field ID where the file will be attached.</td>
+          </tr>
+          <tr>
+            <td><code>fileName</code></td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>File name (e.g. <code>audit.txt</code>). File extension is normalized automatically if omitted.</td>
+          </tr>
+          <tr>
+            <td><code>notes</code></td>
+            <td>string</td>
+            <td>No</td>
+            <td>Optional notes or description attached to the file record.</td>
+          </tr>
+          <tr>
+            <td><code>recordFields</code></td>
+            <td>object</td>
+            <td>No</td>
+            <td>Key-value map of integer Onspring Field IDs to values to populate on the created record.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="file-types">
+      <h2>Supported Formats &amp; Request Examples</h2>
+
+      <article id="type-txt">
+        <h3>1. Plain Text (fileType: txt)</h3>
+        <p>Used for server configurations, command-line outputs, and cryptographic checksums.</p>
+        <pre><code>{
+  "fileType": "txt",
+  "appId": 1050,
+  "attachmentFieldId": 5012,
+  "fileName": "sshd_config_bastion_prod_01.txt",
+  "notes": "Automated snapshot of /etc/ssh/sshd_config from prod-bastion-us-east-1a",
+  "recordFields": {
+    "1201": "CC6.1 - Access Control Configuration",
+    "1202": "Automated Compliance Collector (Cron)",
+    "1203": "PASS"
+  },
+  "text": "=== Host: prod-bastion-us-east-1a ===\nTimestamp: 2026-10-29T14:00:00Z\nSha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\n\n# OpenSSH Server Configuration Snapshot\nPort 22\nProtocol 2\nPermitRootLogin no\nPasswordAuthentication no\nPubkeyAuthentication yes\nAuthorizedKeysFile .ssh/authorized_keys\nKexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256\nCiphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com\nMACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com\nClientAliveInterval 300\nClientAliveCountMax 2\nMaxAuthTries 3\nBanner /etc/issue.net\n\n# Verification Check:\n# [PASS] PermitRootLogin is 'no'\n# [PASS] PasswordAuthentication is 'no'\n# [PASS] Deprecated ciphers (3des, arcfour) are not present\n"
+}</code></pre>
+      </article>
+
+      <article id="type-html">
+        <h3>2. HTML Document (fileType: html)</h3>
+        <p>Accepts markdown or HTML body content to render styled HTML reports.</p>
+        <pre><code>{
+  "fileType": "html",
+  "appId": 1050,
+  "attachmentFieldId": 5012,
+  "fileName": "daily_backup_audit_report.html",
+  "notes": "Automated AWS Aurora RDS automated backup and snapshot verification",
+  "recordFields": {
+    "1201": "CC7.4 - Business Continuity & Backups",
+    "1202": "Nightly AWS Backup Inspector",
+    "1203": "PASS"
+  },
+  "title": "Daily Production Database Backup & Encryption Verification",
+  "markdownOrHtmlBody": "# Daily Production Database Backup Verification\n\n**Run Date:** `2026-10-29 02:00:00 UTC`  \n**Inspector Agent:** `AutomationBot/CloudBackup`  \n**Overall Status:** COMPLIANT (All Targets Passed)\n\n---\n\n## 1. Scope & Targets Evaluated\n\n| Cluster Identifier | Engine | Multi-AZ | Encrypted at Rest | Snapshot Status |\n| :--- | :--- | :--- | :--- | :--- |\n| prod-customer-aurora-pg | PostgreSQL 16.3 | Yes | Enabled | COMPLETED |\n| prod-billing-aurora-pg | PostgreSQL 16.3 | Yes | Enabled | COMPLETED |\n| prod-analytics-dw | Redshift | Yes | Enabled | COMPLETED |"
+}</code></pre>
+      </article>
+
+      <article id="type-csv">
+        <h3>3. Delimited CSV (fileType: csv)</h3>
+        <p>Generates comma-separated spreadsheets from header and row arrays.</p>
+        <pre><code>{
+  "fileType": "csv",
+  "appId": 1050,
+  "attachmentFieldId": 5012,
+  "fileName": "quarterly_access_review_snapshot.csv",
+  "notes": "Q3 2026 Active Directory Privileged Group Membership Export",
+  "recordFields": {
+    "1201": "CC6.2 - User Access Authorization & Review",
+    "1202": "AD Identity Governance Sync Job",
+    "1203": "EVIDENCE COLLECTED"
+  },
+  "headers": [
+    "UserPrincipalName",
+    "SamAccountName",
+    "Department",
+    "PrivilegedRole",
+    "MfaEnforced",
+    "LastLogonTimestamp",
+    "AccountStatus"
+  ],
+  "rows": [
+    [
+      "sfreeman@enterprise.local",
+      "sfreeman",
+      "SecOps",
+      "Domain Admins",
+      "True",
+      "2026-10-29T13:45:12Z",
+      "Active"
+    ],
+    [
+      "deploy-bot@enterprise.local",
+      "svc-deploy",
+      "DevOps",
+      "Cloud Infrastructure Operators",
+      "True",
+      "2026-10-29T11:22:04Z",
+      "Service Account"
+    ]
+  ]
+}</code></pre>
+      </article>
+
+      <article id="type-xlsx">
+        <h3>4. Microsoft Excel (fileType: xlsx)</h3>
+        <p>Generates multi-sheet Excel workbooks.</p>
+        <pre><code>{
+  "fileType": "xlsx",
+  "appId": 1050,
+  "attachmentFieldId": 5012,
+  "fileName": "monthly_vulnerability_remediation_status.xlsx",
+  "notes": "Production Vulnerability Scan & SLA Remediation Report",
+  "recordFields": {
+    "1201": "CC7.1 - Vulnerability Management Program",
+    "1202": "Tenable / Qualys API Exporter",
+    "1203": "REVIEW REQUIRED"
+  },
+  "sheets": [
+    {
+      "name": "Remediation Summary",
+      "headers": [
+        "Severity",
+        "Open Findings",
+        "Within SLA",
+        "Past SLA",
+        "SLA Compliance %"
+      ],
+      "rows": [
+        [ "Critical (< 14 days)", "0", "0", "0", "100.0%" ],
+        [ "High (< 30 days)", "2", "2", "0", "100.0%" ],
+        [ "Medium (< 90 days)", "15", "14", "1", "93.3%" ]
+      ]
+    }
+  ]
+}</code></pre>
+      </article>
+
+      <article id="type-docx">
+        <h3>5. Microsoft Word (fileType: docx)</h3>
+        <p>Generates Word documents with headings, paragraphs, bullet points, and tables.</p>
+        <pre><code>{
+  "fileType": "docx",
+  "appId": 1050,
+  "attachmentFieldId": 5012,
+  "fileName": "annual_dr_failover_test_report.docx",
+  "notes": "Annual Disaster Recovery & Failover Exercise Sign-off Document",
+  "recordFields": {
+    "1201": "CC7.5 - Disaster Recovery Testing",
+    "1202": "IT Risk & Resiliency Committee",
+    "1203": "PASS"
+  },
+  "title": "Annual Disaster Recovery & Multi-Region Failover Simulation",
+  "sections": [
+    {
+      "heading": "1. Executive Summary",
+      "paragraphs": [
+        "On October 15, 2026, the Cloud Operations and Engineering teams executed the annual unannounced disaster recovery simulation to validate Recovery Time Objective (RTO) and Recovery Point Objective (RPO) commitments.",
+        "Primary region traffic in us-east-1 was systematically degraded, triggering automated Route53 health check failover to the standby us-west-2 disaster recovery cluster."
+      ]
+    },
+    {
+      "heading": "2. RTO / RPO Benchmark Results",
+      "table": {
+        "headers": [ "Application Tier", "Committed RTO", "Actual RTO", "Committed RPO", "Actual RPO", "Status" ],
+        "rows": [
+          [ "Web & API Gateway", "< 15 mins", "4 mins 12 secs", "0 mins", "0 mins", "PASSED" ],
+          [ "Primary Database", "< 60 mins", "18 mins 30 secs", "< 15 mins", "4 mins 10 secs", "PASSED" ]
+        ]
+      }
+    }
+  ]
+}</code></pre>
+      </article>
+
+      <article id="type-pptx">
+        <h3>6. Microsoft PowerPoint (fileType: pptx)</h3>
+        <p>Generates PowerPoint slide decks with title and content slides.</p>
+        <pre><code>{
+  "fileType": "pptx",
+  "appId": 1050,
+  "attachmentFieldId": 5012,
+  "fileName": "q3_security_posture_board_review.pptx",
+  "notes": "Q3 2026 Security Steering Committee & Audit Board Briefing",
+  "recordFields": {
+    "1201": "CC2.1 - Board Governance & Security Oversight",
+    "1202": "CISO Office",
+    "1203": "ACCEPTED"
+  },
+  "title": "Q3 2026 Information Security & Compliance Review",
+  "subtitle": "Prepared for the Board Audit & Risk Committee",
+  "slides": [
+    {
+      "title": "Quarterly Highlights & Milestones",
+      "bulletPoints": [
+        "SOC 2 Type II examination successfully completed with zero exceptions noted.",
+        "Zero critical security incidents or customer data breaches reported in the period.",
+        "Security awareness training completion achieved 99.4% across all employees and contractors.",
+        "Automated CI/CD security scanning gates now enforce 100% test coverage on authentication endpoints."
+      ]
+    }
+  ]
+}</code></pre>
+      </article>
+
+      <article id="type-pdf">
+        <h3>7. Portable Document Format (fileType: pdf)</h3>
+        <p>Generates paginated PDF reports with headings, paragraphs, and multi-page tables.</p>
+        <pre><code>{
+  "fileType": "pdf",
+  "appId": 1050,
+  "attachmentFieldId": 5012,
+  "fileName": "soc2_control_implementation_summary.pdf",
+  "notes": "Formal SOC 2 Trust Services Criteria Control Activity Evidence Export",
+  "recordFields": {
+    "1201": "CC6.8 - Software Development Lifecycle Controls",
+    "1202": "GRC Automation Engine",
+    "1203": "VERIFIED"
+  },
+  "title": "Automated Control Validation: CI/CD Branch Protection",
+  "sections": [
+    {
+      "heading": "Control Activity Specification",
+      "paragraphs": [
+        "This evidence document verifies enforcement of mandatory peer reviews, passing continuous integration builds, and cryptographic GPG commit signatures across all production repositories."
+      ],
+      "table": {
+        "headers": [ "Repository", "Protected Branch", "Enforce Admins", "Approving Reviews", "Signed Commits" ],
+        "rows": [
+          [ "enterprise/evidence-generator", "main", "true", "1", "Required" ],
+          [ "enterprise/identity-service", "main", "true", "2", "Required" ],
+          [ "enterprise/core-api", "main", "true", "2", "Required" ]
+        ]
+      }
+    }
+  ]
+}</code></pre>
+      </article>
+    </section>
+
+    <section id="status-codes">
+      <h2>HTTP Status Codes</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Status Code</th>
+            <th>Meaning</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>200 OK</code></td>
+            <td>Documentation</td>
+            <td>Served for any navigation request outside of <code>POST /generate</code>.</td>
+          </tr>
+          <tr>
+            <td><code>202 Accepted</code></td>
+            <td>Queued</td>
+            <td>Request accepted and queued for background generation &amp; Onspring upload. Returns <code>jobId</code>.</td>
+          </tr>
+          <tr>
+            <td><code>400 Bad Request</code></td>
+            <td>Validation Error</td>
+            <td>Invalid JSON or missing/unsupported fields. Returns RFC 7807 <code>ProblemDetails</code>.</td>
+          </tr>
+          <tr>
+            <td><code>401 Unauthorized</code></td>
+            <td>Unauthorized</td>
+            <td>Missing or empty <code>X-Onspring-ApiKey</code> header.</td>
+          </tr>
+          <tr>
+            <td><code>500 Internal Error</code></td>
+            <td>Server Error</td>
+            <td>Unexpected error. Returns RFC 7807 <code>ProblemDetails</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <p>Evidence Generator &bull; Created by Stevan Freeborn &bull; Powered by .NET 10</p>
+  </footer>
+
+  <script>
+    function copyPrompt() {
+      const code = document.getElementById('prompt-content');
+
+      if (!code) {
+        return;
+      } 
+
+      const text = code.innerText || code.textContent;
+      
+      navigator.clipboard
+        .writeText(text)
+        .then(function() {
+          const btn = document.getElementById('copy-btn');
+          
+          if (!btn) {
+            return;
+          }
+
+          const originalText = btn.textContent;
+          
+          btn.textContent = 'Copied!';
+          
+          setTimeout(function() {
+            btn.textContent = originalText;
+          }, 2000);
+        });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<Project>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <PropertyGroup>
+    <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
+    <ContainerBaseImage>mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled-extra</ContainerBaseImage>
+    <ContainerRepository>evidence-generator</ContainerRepository>
+    <NoWarn>$(NoWarn);NU1902;NU1903</NoWarn>
+
+    <PublishProfile Condition="'$(PublishProfile)' == '' and '$(PublishContainer)' == 'true'">DefaultContainer</PublishProfile>
+    <RuntimeIdentifier Condition="'$(PublishContainer)' == 'true' or '$(PublishProfile)' == 'DefaultContainer'">linux-arm64</RuntimeIdentifier>
+    <SelfContained Condition="'$(PublishContainer)' == 'true' or '$(PublishProfile)' == 'DefaultContainer'">false</SelfContained>
+
+    <SatelliteResourceLanguages Condition="'$(PublishContainer)' == 'true' or '$(PublishProfile)' == 'DefaultContainer'">en</SatelliteResourceLanguages>
+    <DebugType Condition="'$(PublishContainer)' == 'true' or '$(PublishProfile)' == 'DefaultContainer'">none</DebugType>
+    <DebugSymbols Condition="'$(PublishContainer)' == 'true' or '$(PublishProfile)' == 'DefaultContainer'">false</DebugSymbols>
+
+    <_BuildTimestamp>$([System.DateTime]::UtcNow.ToString("yyyyMMdd-HHmmss"))</_BuildTimestamp>
+
+    <GitCommitSha Condition="'$(GitCommitSha)' == '' and '$(GITHUB_SHA)' != ''">$([System.String]::Copy('$(GITHUB_SHA)').Substring(0, 7))</GitCommitSha>
+    <GitCommitSha Condition="'$(GitCommitSha)' == '' and '$(BUILD_SOURCEVERSION)' != ''">$([System.String]::Copy('$(BUILD_SOURCEVERSION)').Substring(0, 7))</GitCommitSha>
+  </PropertyGroup>
+
+  <Target Name="ResolveGitCommitShaAndContainerTags" BeforeTargets="_CreateContainerConfiguration;CreateContainer;PublishContainer;ComputeContainerConfig">
+    <Exec 
+      Command="git rev-parse --short HEAD"
+      ConsoleToMSBuild="true"
+      StandardOutputImportance="low"
+      StandardErrorImportance="low"
+      IgnoreExitCode="true"
+      Condition="'$(GitCommitSha)' == ''"
+    >
+      <Output TaskParameter="ConsoleOutput" PropertyName="_ResolvedGitSha" />
+      <Output TaskParameter="ExitCode" PropertyName="_GitExitCode" />
+    </Exec>
+
+    <PropertyGroup>
+      <GitCommitSha Condition="'$(GitCommitSha)' == '' and '$(_GitExitCode)' == '0' and '$(_ResolvedGitSha)' != ''">$(_ResolvedGitSha)</GitCommitSha>
+      <GitCommitSha Condition="'$(GitCommitSha)' == ''">local</GitCommitSha>
+
+      <GeneratedImageTag>evidence-generator-$(_BuildTimestamp)-$(GitCommitSha)</GeneratedImageTag>
+      <ContainerImageTags Condition="'$(ContainerImageTags)' == ''">$(GeneratedImageTag);latest</ContainerImageTags>
+    </PropertyGroup>
+
+    <Message Importance="high" Text="Generated Container Image Tag: $(GeneratedImageTag)" />
+  </Target>
+
+  <ItemGroup Condition="'$(PublishContainer)' == 'true' or '$(PublishProfile)' == 'DefaultContainer'">
+    <Content Update="appsettings*.json" CopyToPublishDirectory="Never" />
+  </ItemGroup>
+</Project>
