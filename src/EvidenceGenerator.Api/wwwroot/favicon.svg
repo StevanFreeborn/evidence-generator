@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Document background with folded corner -->
+  <path d="M14 6 C14 4.89 14.89 4 16 4 L40 4 L52 16 L52 58 C52 59.11 51.11 60 50 60 L16 60 C14.89 60 14 59.11 14 58 Z" fill="#2563eb" />
+  <!-- Folded corner tab -->
+  <polygon points="40,4 52,16 40,16" fill="#1d4ed8" />
+  <!-- Verification checkmark badge -->
+  <circle cx="44" cy="44" r="14" fill="#10b981" stroke="#ffffff" stroke-width="2.5" />
+  <polyline points="38,44 42,48 50,39" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Document text / evidence lines -->
+  <line x1="22" y1="16" x2="34" y2="16" stroke="#93c5fd" stroke-width="3" stroke-linecap="round" />
+  <line x1="22" y1="24" x2="44" y2="24" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+  <line x1="22" y1="32" x2="34" y2="32" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+</svg>

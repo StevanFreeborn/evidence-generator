@@ -141,4 +141,103 @@ public class GenerateEndpointTests(CustomWebApplicationFactory factory) : IClass
       Arg.Any<CancellationToken>()
     );
   }
+
+  [Fact]
+  public async Task PostGenerate_ValidJsonRequest_Returns202AcceptedAndEnqueuesJob()
+  {
+    var mockQueue = Substitute.For<IBackgroundJobQueue>();
+    mockQueue.DequeueAsync(Arg.Any<CancellationToken>())
+      .Returns(async callInfo =>
+      {
+        var ct = callInfo.Arg<CancellationToken>();
+        await Task.Delay(Timeout.Infinite, ct);
+        return null!;
+      });
+
+    using var factory = _factory.WithWebHostBuilder(builder =>
+    {
+      builder.ConfigureServices(services =>
+      {
+        services.AddSingleton(mockQueue);
+      });
+    });
+
+    var client = factory.CreateClient();
+    client.DefaultRequestHeaders.Add(OnspringApiKeyAuthenticationDefaults.HeaderName, "test-api-key");
+
+    var payload = """
+      {
+        "fileType": "json",
+        "appId": 15,
+        "attachmentFieldId": 25,
+        "fileName": "security_audit",
+        "data": { "service": "iam", "compliant": true }
+      }
+    """;
+
+    var content = new StringContent(payload, Encoding.UTF8, "application/json");
+    var response = await client.PostAsync("/generate", content);
+
+    Assert.Equal(HttpStatusCode.Accepted, response.StatusCode);
+
+    await mockQueue.Received(1).EnqueueAsync(
+      Arg.Is<EvidenceJob>(j =>
+        j.ApiKey == "test-api-key" &&
+        j.Request is JsonEvidenceRequest &&
+        j.Request.AppId == 15
+      ),
+      Arg.Any<CancellationToken>()
+    );
+  }
+
+  [Fact]
+  public async Task PostGenerate_ValidJsonlRequest_Returns202AcceptedAndEnqueuesJob()
+  {
+    var mockQueue = Substitute.For<IBackgroundJobQueue>();
+    mockQueue.DequeueAsync(Arg.Any<CancellationToken>())
+      .Returns(async callInfo =>
+      {
+        var ct = callInfo.Arg<CancellationToken>();
+        await Task.Delay(Timeout.Infinite, ct);
+        return null!;
+      });
+
+    using var factory = _factory.WithWebHostBuilder(builder =>
+    {
+      builder.ConfigureServices(services =>
+      {
+        services.AddSingleton(mockQueue);
+      });
+    });
+
+    var client = factory.CreateClient();
+    client.DefaultRequestHeaders.Add(OnspringApiKeyAuthenticationDefaults.HeaderName, "test-api-key");
+
+    var payload = """
+      {
+        "fileType": "jsonl",
+        "appId": 18,
+        "attachmentFieldId": 28,
+        "fileName": "cloudtrail_events",
+        "lines": [
+          { "eventId": "1", "action": "AssumeRole" },
+          { "eventId": "2", "action": "ListBuckets" }
+        ]
+      }
+    """;
+
+    var content = new StringContent(payload, Encoding.UTF8, "application/json");
+    var response = await client.PostAsync("/generate", content);
+
+    Assert.Equal(HttpStatusCode.Accepted, response.StatusCode);
+
+    await mockQueue.Received(1).EnqueueAsync(
+      Arg.Is<EvidenceJob>(j =>
+        j.ApiKey == "test-api-key" &&
+        j.Request is JsonlEvidenceRequest &&
+        j.Request.AppId == 18
+      ),
+      Arg.Any<CancellationToken>()
+    );
+  }
 }

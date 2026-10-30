@@ -49,6 +49,8 @@ internal static class ServiceCollectionExtensions
     services.AddSingleton<IFileGenerator, DocxFileGenerator>();
     services.AddSingleton<IFileGenerator, PptxFileGenerator>();
     services.AddSingleton<IFileGenerator, PdfFileGenerator>();
+    services.AddSingleton<IFileGenerator, JsonFileGenerator>();
+    services.AddSingleton<IFileGenerator, JsonlFileGenerator>();
     services.AddSingleton<IFileGeneratorDispatcher, FileGeneratorDispatcher>();
 
     return services;
@@ -63,6 +65,8 @@ internal static class ServiceCollectionExtensions
     services.AddSingleton<IEvidenceTypeValidator, DocxEvidenceRequestValidator>();
     services.AddSingleton<IEvidenceTypeValidator, PptxEvidenceRequestValidator>();
     services.AddSingleton<IEvidenceTypeValidator, PdfEvidenceRequestValidator>();
+    services.AddSingleton<IEvidenceTypeValidator, JsonEvidenceRequestValidator>();
+    services.AddSingleton<IEvidenceTypeValidator, JsonlEvidenceRequestValidator>();
     services.AddSingleton<IEvidenceRequestValidator, EvidenceRequestValidatorDispatcher>();
 
     return services;

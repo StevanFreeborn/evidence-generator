@@ -15,6 +15,8 @@ public class FileGeneratorDispatcherTests
   [InlineData(SupportedFileType.Docx)]
   [InlineData(SupportedFileType.Pptx)]
   [InlineData(SupportedFileType.Pdf)]
+  [InlineData(SupportedFileType.Json)]
+  [InlineData(SupportedFileType.Jsonl)]
   internal async Task Dispatch_RoutesToMatchingGenerator(SupportedFileType fileType)
   {
     var mockGenerators = new List<IFileGenerator>();
@@ -48,6 +50,8 @@ public class FileGeneratorDispatcherTests
       SupportedFileType.Docx => new DocxEvidenceRequest { AppId = 1, AttachmentFieldId = 2, FileName = "f", Title = "t", Sections = [new DocxSection("h", "p")] },
       SupportedFileType.Pptx => new PptxEvidenceRequest { AppId = 1, AttachmentFieldId = 2, FileName = "f", Slides = [new PptxSlide("s", ["b"])] },
       SupportedFileType.Pdf => new PdfEvidenceRequest { AppId = 1, AttachmentFieldId = 2, FileName = "f", Title = "t", Sections = [new PdfSection("h", "b")] },
+      SupportedFileType.Json => new JsonEvidenceRequest { AppId = 1, AttachmentFieldId = 2, FileName = "f", Json = "{}" },
+      SupportedFileType.Jsonl => new JsonlEvidenceRequest { AppId = 1, AttachmentFieldId = 2, FileName = "f", Text = "{}\n" },
       _ => throw new ArgumentException("Unsupported file type", nameof(fileType))
     };
 

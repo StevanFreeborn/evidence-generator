@@ -59,6 +59,8 @@ internal sealed class GenerateEvidenceRequestJsonConverter : JsonConverter<Gener
       SupportedFileType.Docx => typeof(DocxEvidenceRequest),
       SupportedFileType.Pptx => typeof(PptxEvidenceRequest),
       SupportedFileType.Pdf => typeof(PdfEvidenceRequest),
+      SupportedFileType.Json => typeof(JsonEvidenceRequest),
+      SupportedFileType.Jsonl => typeof(JsonlEvidenceRequest),
       _ => throw new JsonException($"Unsupported file type: {fileType}")
     };
 

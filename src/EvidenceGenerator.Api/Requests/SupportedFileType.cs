@@ -8,5 +8,7 @@ internal enum SupportedFileType
   Xlsx,
   Docx,
   Pptx,
-  Pdf
+  Pdf,
+  Json,
+  Jsonl
 }

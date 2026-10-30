@@ -40,6 +40,12 @@ public class GenerateEvidenceRequestJsonConverterTests
   [InlineData("pdf", typeof(PdfEvidenceRequest))]
   [InlineData("PDF", typeof(PdfEvidenceRequest))]
   [InlineData("Pdf", typeof(PdfEvidenceRequest))]
+  [InlineData("json", typeof(JsonEvidenceRequest))]
+  [InlineData("JSON", typeof(JsonEvidenceRequest))]
+  [InlineData("Json", typeof(JsonEvidenceRequest))]
+  [InlineData("jsonl", typeof(JsonlEvidenceRequest))]
+  [InlineData("JSONL", typeof(JsonlEvidenceRequest))]
+  [InlineData("Jsonl", typeof(JsonlEvidenceRequest))]
   public void Deserialize_AllSupportedFileTypes_ReturnsExpectedDerivedType(string fileType, Type expectedType)
   {
     var json = fileType.ToLowerInvariant() switch
@@ -51,6 +57,8 @@ public class GenerateEvidenceRequestJsonConverterTests
       "docx" => $$"""{"fileType":"{{fileType}}","appId":1,"attachmentFieldId":2,"fileName":"test.docx","title":"Doc","sections":[{"heading":"H1","paragraphText":"P1"}]}""",
       "pptx" => $$"""{"fileType":"{{fileType}}","appId":1,"attachmentFieldId":2,"fileName":"test.pptx","slides":[{"title":"Slide 1","bulletPoints":["Point 1"]}]}""",
       "pdf" => $$"""{"fileType":"{{fileType}}","appId":1,"attachmentFieldId":2,"fileName":"test.pdf","title":"Pdf","sections":[{"heading":"H1","body":"B1"}]}""",
+      "json" => $$"""{"fileType":"{{fileType}}","appId":1,"attachmentFieldId":2,"fileName":"test.json","json":"{\"key\":\"value\"}"}""",
+      "jsonl" => $$"""{"fileType":"{{fileType}}","appId":1,"attachmentFieldId":2,"fileName":"test.jsonl","text":"{\"key\":\"value\"}\n"}""",
       _ => throw new ArgumentException("Unknown type", nameof(fileType))
     };
 
