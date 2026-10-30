@@ -60,6 +60,21 @@ public class DocumentationEndpointTests(CustomWebApplicationFactory factory) : I
   }
 
   [Fact]
+  public async Task Get_Favicon_Returns200AndServesSvg()
+  {
+    var client = _factory.CreateClient();
+
+    var response = await client.GetAsync("/favicon.svg");
+
+    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    Assert.NotNull(response.Content.Headers.ContentType);
+    Assert.Contains("image/svg+xml", response.Content.Headers.ContentType.MediaType, StringComparison.OrdinalIgnoreCase);
+
+    var body = await response.Content.ReadAsStringAsync();
+    Assert.Contains("<svg", body, StringComparison.Ordinal);
+  }
+
+  [Fact]
   public async Task Post_ToGenerate_ContinuesToRequireAuthentication()
   {
     var client = _factory.CreateClient();

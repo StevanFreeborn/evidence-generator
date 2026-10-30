@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Evidence Generator Documentation</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <style>
     :root {
       font-size: 16px;
@@ -233,6 +234,8 @@
             <li><a href="#type-docx">5. Microsoft Word (.docx)</a></li>
             <li><a href="#type-pptx">6. Microsoft PowerPoint (.pptx)</a></li>
             <li><a href="#type-pdf">7. Portable Document Format (.pdf)</a></li>
+            <li><a href="#type-json">8. JavaScript Object Notation (.json)</a></li>
+            <li><a href="#type-jsonl">9. JSON Lines (.jsonl)</a></li>
           </ul>
         </li>
       </ul>
@@ -315,6 +318,14 @@ Format-Specific Properties (Add based on "fileType"):
   - "paragraphs": array of strings (Optional) - Paragraph texts
   - "table": object (Optional) with "headers": string[] and "rows": string[][]
 
+8. When "fileType": "json"
+- "data": object or array (Optional) - Arbitrary structured JSON data (serialized formatted and indented)
+- "json": string (Optional) - Raw JSON string (one of "data" or "json" is required)
+
+9. When "fileType": "jsonl"
+- "lines": array of objects (Optional) - Array of records serialized as newline-delimited JSON
+- "text": string (Optional) - Raw multiline JSONL string (one of "lines" or "text" is required)
+
 Task Instructions:
 - Output ONLY a single, valid, raw JSON object without markdown fences or extraneous commentary.
 - Ensure all required fields are present and properly typed.
@@ -360,7 +371,7 @@ Task Instructions:
             <td><code>fileType</code></td>
             <td>string</td>
             <td>Yes</td>
-            <td>Format discriminator: <code>txt</code>, <code>html</code>, <code>csv</code>, <code>xlsx</code>, <code>docx</code>, <code>pptx</code>, <code>pdf</code>.</td>
+            <td>Format discriminator: <code>txt</code>, <code>html</code>, <code>csv</code>, <code>xlsx</code>, <code>docx</code>, <code>pptx</code>, <code>pdf</code>, <code>json</code>, <code>jsonl</code>.</td>
           </tr>
           <tr>
             <td><code>appId</code></td>
@@ -612,6 +623,79 @@ Task Instructions:
           [ "enterprise/core-api", "main", "true", "2", "Required" ]
         ]
       }
+    }
+  ]
+}</code></pre>
+      </article>
+
+      <article id="type-json">
+        <h3>8. JavaScript Object Notation (fileType: json)</h3>
+        <p>Generates formatted and indented JSON evidence files (e.g., security findings, configuration snapshots, API responses). Provide either structured <code>data</code> or raw <code>json</code> text.</p>
+        <pre><code>{
+  "fileType": "json",
+  "appId": 1050,
+  "attachmentFieldId": 5012,
+  "fileName": "security_hub_findings.json",
+  "notes": "Automated export of AWS Security Hub critical findings",
+  "recordFields": {
+    "1201": "AWS Security Hub Findings Snapshot",
+    "1202": "Automated Scanner",
+    "1203": "REVIEW_PENDING"
+  },
+  "data": {
+    "scanDate": "2026-10-29T21:00:00Z",
+    "account": "123456789012",
+    "findingsCount": 2,
+    "findings": [
+      {
+        "id": "arn:aws:securityhub:us-east-1:123456789012:subscription/pci-dss/v/3.2.1/PCI.S3.1/finding/1",
+        "title": "S3 buckets should prohibit public read access",
+        "severity": "CRITICAL",
+        "remediation": {
+          "recommendation": "Block public access at the bucket level."
+        }
+      },
+      {
+        "id": "arn:aws:securityhub:us-east-1:123456789012:subscription/pci-dss/v/3.2.1/PCI.IAM.1/finding/2",
+        "title": "IAM root user access key should not exist",
+        "severity": "HIGH",
+        "remediation": {
+          "recommendation": "Delete active root user access keys."
+        }
+      }
+    ]
+  }
+}</code></pre>
+      </article>
+
+      <article id="type-jsonl">
+        <h3>9. JSON Lines (fileType: jsonl)</h3>
+        <p>Generates streaming newline-delimited JSON (ndjson) evidence files (e.g., audit trails, event streams, CloudTrail logs). Provide an array of records via <code>lines</code> or pre-formatted newline-separated lines via <code>text</code>.</p>
+        <pre><code>{
+  "fileType": "jsonl",
+  "appId": 1050,
+  "attachmentFieldId": 5012,
+  "fileName": "audit_events.jsonl",
+  "notes": "Privileged user authentication events stream",
+  "recordFields": {
+    "1201": "CloudTrail Privileged Activity",
+    "1202": "Security Operations Center",
+    "1203": "ARCHIVED"
+  },
+  "lines": [
+    {
+      "eventTime": "2026-10-29T20:15:02Z",
+      "eventName": "ConsoleLogin",
+      "userIdentity": { "type": "IAMUser", "userName": "admin-sfree" },
+      "responseElements": { "ConsoleLogin": "Success" },
+      "mfaUsed": true
+    },
+    {
+      "eventTime": "2026-10-29T20:21:44Z",
+      "eventName": "AssumeRole",
+      "userIdentity": { "type": "IAMUser", "userName": "admin-sfree" },
+      "requestParameters": { "roleArn": "arn:aws:iam::123456789012:role/ProductionDeployer" },
+      "responseElements": { "credentials": { "accessKeyId": "ASIA..." } }
     }
   ]
 }</code></pre>
