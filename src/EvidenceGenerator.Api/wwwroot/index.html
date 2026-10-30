@@ -269,7 +269,7 @@ Header: X-Onspring-ApiKey: &lt;YOUR_API_KEY&gt;
 The request must be a valid JSON object matching this schema:
 
 Base Properties (Required for all types):
-- "fileType": string (Required) - Exactly one of: "txt", "html", "csv", "xlsx", "docx", "pptx", "pdf"
+- "fileType": string (Required) - Exactly one of: "txt", "html", "csv", "xlsx", "docx", "pptx", "pdf", "json", "jsonl"
 - "appId": integer (Required) - Target Onspring Application ID (e.g. 1050)
 - "attachmentFieldId": integer (Required) - Target Attachment Field ID (e.g. 5012)
 - "fileName": string (Required) - The file name (e.g. "evidence_output.txt")
@@ -291,32 +291,29 @@ Format-Specific Properties (Add based on "fileType"):
 
 4. When "fileType": "xlsx"
 - "sheets": array of objects (Required), each with:
-  - "name": string (Required) - Sheet name
-  - "headers": array of strings (Required) - Column names
+  - "sheetName": string (Required) - Sheet name
+  - "columns": array of strings (Required) - Column header names
   - "rows": array of arrays of strings (Required) - Matrix of row cells
 
 5. When "fileType": "docx"
 - "title": string (Required) - Document title
 - "sections": array of objects (Required), each with:
-  - "heading": string (Required) - Section heading
-  - "paragraphs": array of strings (Optional) - Paragraph texts
-  - "bulletPoints": array of strings (Optional) - List items
-  - "table": object (Optional) with "headers": string[] and "rows": string[][]
+  - "heading": string (Optional) - Section heading
+  - "paragraphText": string (Required) - Section body text
+- "table": object (Optional) with:
+  - "headers": array of strings (Required) - Table column headers
+  - "rows": array of arrays of strings (Required) - Table rows
 
 6. When "fileType": "pptx"
-- "title": string (Required) - Presentation title
-- "subtitle": string (Optional) - Subtitle on title slide
 - "slides": array of objects (Required), each with:
   - "title": string (Required) - Slide title
-  - "bulletPoints": array of strings (Optional) - Bulleted list
-  - "table": object (Optional) with "headers": string[] and "rows": string[][]
+  - "bulletPoints": array of strings (Required) - Bulleted list of text items
 
 7. When "fileType": "pdf"
 - "title": string (Required) - Document title
 - "sections": array of objects (Required), each with:
-  - "heading": string (Required) - Section heading
-  - "paragraphs": array of strings (Optional) - Paragraph texts
-  - "table": object (Optional) with "headers": string[] and "rows": string[][]
+  - "heading": string (Optional) - Section heading
+  - "body": string (Required) - Section body text
 
 8. When "fileType": "json"
 - "data": object or array (Optional) - Arbitrary structured JSON data (serialized formatted and indented)
